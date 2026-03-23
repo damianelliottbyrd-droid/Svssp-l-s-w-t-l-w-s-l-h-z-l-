@@ -1,4 +1,4 @@
-# Analog Horror: The Doll Cipher
+ The Doll Cipher
 
 An atmospheric Alternate Reality Game (ARG) styled as analog horror, featuring VHS tape aesthetics, static noise, and floating doll elements. Decode ciphers to uncover the eerie story, with a focus on creative horror rather than intense scares.
 
