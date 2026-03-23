@@ -401,6 +401,15 @@
     <h2 class="final-reveal">YOU ARE TRAPPED IN THE ABYSS FOREVER</h2>
     <img src="assets/doll-bg.jpg" alt="The Doll" style="max-width: 300px; display: block; margin: 20px auto; border: 2px solid #ff0000;">
     <p class="final-reveal">All ciphers solved, but the horror never ends. The doll's embrace is eternal, her porcelain skin cold against your flesh, her glass eyes reflecting your terror. Her laughter echoes through the endless night, a sound that twists your sanity. You've played the game, decoded the secrets, but in doing so, you've invited the darkness in. She was waiting for someone clever enough to find her— and now, she's found you. The abyss swallows all, pulling you deeper into madness. Your screams are silent, your struggles futile. No reset, no escape. The tape loops eternally, and so does your torment. Feel her fingers in your mind, rearranging your thoughts. You are not alone; you are hers.</p>
+    <p class="final-reveal">But perhaps... you can choose your fate.</p>
+    <button id="escape-btn" class="final-reveal">Try to Escape</button>
+    <button id="fight-btn" class="final-reveal">Fight the Doll</button>
+    <div id="escape-ending" class="ending" style="display: none;">
+      <p>You bolt for the door, heart pounding. The knob turns, but as you step out, the hallway stretches infinitely. The doll appears behind you, closer than before. "You can't leave," she whispers. The door slams shut. You are trapped forever, running in circles.</p>
+    </div>
+    <div id="fight-ending" class="ending" style="display: none;">
+      <p>You lunge at the doll, fists clenched. She shatters under your grip, porcelain shards cutting your skin. But from the pieces, she reforms, larger, angrier. Her hands wrap around your throat. "Foolish child," she hisses. You fall, and the darkness claims you.</p>
+    </div>
     <p class="final-reveal">She has you now. Forever.</p>
   </div>
 
@@ -701,6 +710,19 @@
       } else {
         alert('The tracks bend...');
       }
+    });
+
+    // Final choice buttons
+    document.getElementById('escape-btn').addEventListener('click', () => {
+      document.getElementById('escape-ending').style.display = 'block';
+      document.getElementById('escape-btn').style.display = 'none';
+      document.getElementById('fight-btn').style.display = 'none';
+    });
+
+    document.getElementById('fight-btn').addEventListener('click', () => {
+      document.getElementById('fight-ending').style.display = 'block';
+      document.getElementById('escape-btn').style.display = 'none';
+      document.getElementById('fight-btn').style.display = 'none';
     });
 
     // Final horror effect
