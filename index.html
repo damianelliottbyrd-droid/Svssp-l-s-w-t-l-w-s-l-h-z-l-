@@ -410,6 +410,28 @@
     </div>
   </div>
 
+  <div id="story-unlock" class="cipher-section" style="display: none;">
+    <h2 class="final-reveal">THE TRUTH REVEALED</h2>
+    <p class="horror-text" style="text-align: left; line-height: 1.8; color: #ffcccc; margin: 20px auto; max-width: 600px;">
+      I woke up to darkness. Not the comforting kind of dark, but the heavy, suffocating kind that smells of dust and old wood. At first, I thought it was my imagination. The room was quiet… too quiet.<br><br>
+      Then I saw her.<br><br>
+      Lolli.<br><br>
+      She was small, sitting perfectly still in the corner, her stitched smile wide and wrong, the kind that makes your stomach twist. Her eyes… hollow, empty, but somehow watching me anyway. I couldn't look away.<br><br>
+      I tried to move, but my limbs felt slow, uncooperative. The air felt thick, like it was holding me down. I blinked, and the strings attached to her arms twitched. Just slightly, just enough to make me think it wasn't the wind.<br><br>
+      I didn't want to be here. I didn't want to see her again. But I couldn't leave. The door wasn't where it had been before. Or maybe… it never existed at all.<br><br>
+      I could hear the floorboards creak behind me, but no one was there. Or maybe something was, something just out of sight, moving along with me, laughing silently.<br><br>
+      Hours passed, or maybe minutes—I had no sense of time. Every sound, every shadow made my heart hammer faster. Lolli never moved from her corner, yet I could feel her presence closer and closer with each passing second.<br><br>
+      I tried to scream, but my voice was gone. I tried to hide, but the room seemed to stretch, twist, and fold around me. The walls weren't walls anymore—they were strings, pulling me in, tightening, guiding me toward her.<br><br>
+      And then I understood.<br><br>
+      It wasn't just a puppet.<br><br>
+      It was alive. And I was the thing it wanted.<br><br>
+      I was the one trapped in its playhouse.<br><br>
+      <span style="font-style: italic; color: #ff99ff;">I can still feel the strings brushing against my skin. I can still hear her stitched smile in my head, whispering:</span><br><br>
+      <span style="font-weight: bold; color: #ff6666;">Welcome home.</span>
+    </p>
+    <button id="reset-btn" style="background-color: #555; color: #ffff00; border: 3px solid #ffff00; padding: 15px 30px; font-size: 1.2em; margin: 20px 10px; cursor: pointer; text-transform: uppercase; font-weight: bold;">RESET & START OVER</button>
+  </div>
+
   <div id="final" class="cipher-section">
     <h2 class="final-reveal">YOU ARE TRAPPED IN THE ABYSS FOREVER</h2>
     <img src="assets/doll-bg.jpg" alt="The Doll" style="max-width: 300px; display: block; margin: 20px auto; border: 2px solid #ff0000;">
@@ -623,6 +645,53 @@
     // ARG Logic
     let currentCipher = 0;
     const ciphers = ['cipher1', 'cipher2', 'cipher3', 'cipher4', 'cipher5', 'cipher6', 'cipher7', 'cipher8', 'final'];
+    
+    // Puzzle tracking system
+    let solvedPuzzles = 0;
+    let solvedCipherIds = new Set();
+    const maxPuzzles = 3;
+
+    function incrementPuzzleCounter(cipherId) {
+      if (!solvedCipherIds.has(cipherId)) {
+        solvedCipherIds.add(cipherId);
+        solvedPuzzles++;
+        console.log(`Puzzles solved: ${solvedPuzzles}/${maxPuzzles}`);
+        
+        // Check if story should unlock
+        if (solvedPuzzles >= maxPuzzles) {
+          showStoryUnlock();
+        }
+      }
+    }
+
+    function showStoryUnlock() {
+      setTimeout(() => {
+        document.querySelectorAll('.cipher-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('story-unlock').classList.add('active');
+        document.getElementById('story-unlock').style.display = 'block';
+        alert('You have discovered the truth... Read the story to understand your fate.');
+      }, 3000);
+    }
+
+    function resetGame() {
+      solvedPuzzles = 0;
+      solvedCipherIds.clear();
+      document.getElementById('initial-page').style.display = 'block';
+      document.getElementById('password-section').style.display = 'block';
+      document.getElementById('video-section').style.display = 'none';
+      document.getElementById('story-unlock').style.display = 'none';
+      document.getElementById('password-input').value = '';
+      document.querySelectorAll('.cipher-section').forEach(s => {
+        s.classList.remove('active');
+        s.querySelectorAll('input').forEach(input => input.value = '');
+        s.querySelectorAll('[id*="reveal"], [id*="ending"]').forEach(el => {
+          el.style.display = 'none';
+        });
+      });
+      location.reload();
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', resetGame);
 
     document.getElementById('play-tape').addEventListener('click', () => {
       document.getElementById('initial-page').style.display = 'none';
@@ -644,6 +713,7 @@
       const input = document.getElementById('caesar-input').value.toLowerCase().trim();
       if (input === 'the doll is alive') {
         document.getElementById('caesar-reveal').style.display = 'block';
+        incrementPuzzleCounter('caesar');
         setTimeout(() => showCipher(1), 3000);
       } else {
         alert('The tape skips... try again.');
@@ -654,6 +724,7 @@
     document.getElementById('atbash-submit').addEventListener('click', () => {
       const input = document.getElementById('atbash-input').value.toLowerCase().trim();
       if (input === 'help me') {
+        incrementPuzzleCounter('atbash');
         document.getElementById('atbash-reveal').style.display = 'block';
         setTimeout(() => showCipher(2), 3000);
       } else {
@@ -665,6 +736,7 @@
     document.getElementById('morse-submit').addEventListener('click', () => {
       const input = document.getElementById('morse-input').value.toLowerCase().trim();
       if (input === 'run') {
+        incrementPuzzleCounter('morse');
         document.getElementById('morse-reveal').style.display = 'block';
         setTimeout(() => showCipher(3), 3000);
       } else {
