@@ -748,6 +748,7 @@
     document.getElementById('vigenere-submit').addEventListener('click', () => {
       const input = document.getElementById('vigenere-input').value.toLowerCase().trim();
       if (input === 'beware the ghost') {
+        incrementPuzzleCounter('vigenere');
         document.getElementById('vigenere-reveal').style.display = 'block';
         setTimeout(() => showCipher(4), 3000);
       } else {
@@ -758,7 +759,8 @@
     // Base64 Check
     document.getElementById('base64-submit').addEventListener('click', () => {
       const input = document.getElementById('base64-input').value.toLowerCase().trim();
-      if (input === 'blood') {
+      ifincrementPuzzleCounter('base64');
+         (input === 'blood') {
         document.getElementById('base64-reveal').style.display = 'block';
         setTimeout(() => showCipher(5), 3000);
       } else {
