@@ -318,10 +318,13 @@
     </div>
     <div id="video-section" style="display: none; margin: 20px 0;">
       <p style="color: #ffcccc; margin-bottom: 10px;">Hidden Footage Unlocked:</p>
-      <video width="320" height="240" controls style="border: 2px solid #ff0000; background: #000;">
-        <source src="assets/secret-video.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
+      <div id="doll-video" style="width: 320px; height: 240px; background: #000; border: 2px solid #ff0000; margin: 0 auto; position: relative; overflow: hidden; cursor: pointer;" onclick="playDollVideo()">
+        <div style="text-align: center; padding: 100px 20px; color: #fff; font-size: 3em;">👹</div>
+        <p style="position: absolute; bottom: 10px; left: 10px; right: 10px; color: #ffcccc; font-size: 0.9em; text-align: center;">Click to play...</p>
+      </div>
+      <div id="screen-break" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; pointer-events: none;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4em; color: #ff0000; font-weight: bold;">SCREEN BROKEN</div>
+      </div>
     </div>
     <button id="play-tape">PLAY TAPE</button>
   </div>
@@ -725,6 +728,46 @@
         alert('The tracks bend...');
       }
     });
+
+    // Doll video playback
+    function playDollVideo() {
+      const videoDiv = document.getElementById('doll-video');
+      const screenBreak = document.getElementById('screen-break');
+      
+      // Play high-pitched voice
+      if (audioContext) {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 1200; // high pitched
+        gain.gain.value = 0.1;
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + 1.5);
+      }
+      
+      // Animate doll speaking
+      videoDiv.style.opacity = '0.5';
+      videoDiv.innerHTML = '<div style="text-align: center; padding: 100px 20px; color: #ffcccc; font-size: 2em;">"LET ME OUT..."</div>';
+      
+      setTimeout(() => {
+        videoDiv.style.opacity = '1';
+        videoDiv.innerHTML = '<div style="text-align: center; padding: 100px 20px; color: #fff; font-size: 3em;">👹</div>';
+        
+        // Screen break effect
+        setTimeout(() => {
+          screenBreak.style.display = 'block';
+          document.body.style.filter = 'brightness(0.5)';
+          
+          setTimeout(() => {
+            screenBreak.style.display = 'none';
+            document.body.style.filter = 'brightness(1)';
+            videoDiv.innerHTML = '<p style="color: #ff0000; font-size: 1.5em; text-align: center; padding: 100px 20px;">VIDEO CORRUPTED</p>';
+          }, 1000);
+        }, 800);
+      }, 1500);
+    }
 
     // Password protection
     document.getElementById('password-submit').addEventListener('click', () => {
