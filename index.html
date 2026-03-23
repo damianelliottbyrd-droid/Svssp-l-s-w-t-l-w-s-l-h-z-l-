@@ -255,6 +255,11 @@
       to { opacity: 1; }
     }
 
+    @keyframes fadeHint {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.4; }
+    }
+
     .final-reveal {
       font-size: 2em;
       color: #ffffff;
@@ -318,7 +323,7 @@
     <input type="text" id="caesar-input" placeholder="Enter decoded message">
     <button id="caesar-submit">Submit</button>
     <div id="caesar-reveal" class="horror-text" style="display: none;">
-      As you crack the code, the room grows colder. The old doll on the shelf— the one with porcelain skin and glass eyes— begins to stir. You swear you see its head turn slightly, its stitched smile widening. Whispers fill the air: 'The doll is alive... and she's coming for you.' Shadows dance on the walls, and you feel an icy hand brush your neck. The game has begun, and there's no turning back.
+      As you crack the code, the room grows colder. The old doll on the shelf— the one with porcelain skin and glass eyes— begins to stir. You swear you see its head turn slightly, its stitched smile widening. Whispers fill the air: 'The doll is alive... and she's coming for you.' Shadows dance on the walls, and you feel an icy hand brush your neck. A faint breath tickles your ear. The game has begun, and there's no turning back.
     </div>
   </div>
 
@@ -431,6 +436,16 @@
         return whiteNoise;
       })();
 
+      // Subtle heartbeat
+      const heartbeatOsc = audioContext.createOscillator();
+      const heartbeatGain = audioContext.createGain();
+      heartbeatOsc.type = 'sine';
+      heartbeatOsc.frequency.value = 1; // very low for subtle thump
+      heartbeatGain.gain.value = 0.02;
+      heartbeatOsc.connect(heartbeatGain);
+      heartbeatGain.connect(audioContext.destination);
+      heartbeatOsc.start();
+
       osc.type = 'sawtooth';
       osc.frequency.value = 50;
       gain.gain.value = 0.07;
@@ -505,11 +520,47 @@
         "tape distortion detected",
         "analog signals fading",
         "ghost in the machine",
-        "dolls don't blink"
+        "dolls don't blink",
+        "something moved in the corner",
+        "you feel eyes on your back",
+        "a whisper... 'play with me'",
+        "the air feels colder",
+        "shadows lengthen unnaturally",
+        "heartbeat... or is it yours?",
+        "dolls don't breathe... do they?"
       ];
       console.log("%" + "c" + messages[Math.floor(Math.random() * messages.length)], 
         "color: #888; font-style: italic;");
     }, 8000);
+
+    // Subtle hints overlay
+    setInterval(() => {
+      if (Math.random() < 0.3) { // 30% chance every 15 seconds
+        const hint = document.createElement('div');
+        hint.textContent = ['...watching...', '...so close...', '...join us...', '...not alone...'][Math.floor(Math.random() * 4)];
+        hint.style.position = 'absolute';
+        hint.style.top = Math.random() * 80 + 10 + '%';
+        hint.style.left = Math.random() * 80 + 10 + '%';
+        hint.style.color = '#ffcccc';
+        hint.style.fontSize = '0.8em';
+        hint.style.opacity = '0.4';
+        hint.style.pointerEvents = 'none';
+        hint.style.zIndex = '10';
+        hint.style.animation = 'fadeHint 3s ease-in-out';
+        document.body.appendChild(hint);
+        setTimeout(() => hint.remove(), 3000);
+      }
+    }, 15000);
+
+    // Random flicker
+    setInterval(() => {
+      if (Math.random() < 0.1) { // 10% chance
+        document.body.style.filter += ' brightness(0.5)';
+        setTimeout(() => {
+          document.body.style.filter = document.body.style.filter.replace(' brightness(0.5)', '');
+        }, 200);
+      }
+    }, 10000);
 
     // ARG Logic
     let currentCipher = 0;
