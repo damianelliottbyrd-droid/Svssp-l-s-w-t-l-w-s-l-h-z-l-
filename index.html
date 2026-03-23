@@ -311,6 +311,18 @@
     <p>
       You found an old VHS tape in the attic, labeled "Doll Cipher." Curiosity gets the better of you— you pop it into the player. The screen flickers to life with static and eerie music. A child's voice whispers: "I want to play... but no one plays with me anymore." The binary code flashes: <span class="binary">01001100 01001111 01001100 01001100 01001001</span> <small>(L O L L I)</small>. Something feels wrong. The dolls in the room seem to watch you. Do you dare press play?
     </p>
+    <div id="password-section" style="margin: 20px 0;">
+      <p style="color: #ffcccc; text-transform: uppercase; font-size: 0.9em;">Enter the access code to proceed:</p>
+      <input type="password" id="password-input" placeholder="Enter code" style="background-color: #222; color: #fff; border: 2px solid #666; padding: 10px; font-family: monospace; font-size: 1em; text-align: center; width: 200px;">
+      <button id="password-submit" style="background-color: #333; color: #fff; border: 2px solid #666; padding: 10px 20px; font-family: monospace; font-size: 0.9em; cursor: pointer; margin: 10px; text-transform: uppercase;">Unlock</button>
+    </div>
+    <div id="video-section" style="display: none; margin: 20px 0;">
+      <p style="color: #ffcccc; margin-bottom: 10px;">Hidden Footage Unlocked:</p>
+      <video width="320" height="240" controls style="border: 2px solid #ff0000; background: #000;">
+        <source src="assets/secret-video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
     <button id="play-tape">PLAY TAPE</button>
   </div>
 
@@ -711,6 +723,26 @@
         setTimeout(() => showCipher(8), 3000);
       } else {
         alert('The tracks bend...');
+      }
+    });
+
+    // Password protection
+    document.getElementById('password-submit').addEventListener('click', () => {
+      const password = document.getElementById('password-input').value.trim();
+      if (password === '1977') {
+        document.getElementById('password-section').style.display = 'none';
+        document.getElementById('video-section').style.display = 'block';
+        alert('Access granted. The forbidden footage is yours.');
+      } else {
+        alert('Access denied. The code is wrong.');
+        document.getElementById('password-input').value = '';
+      }
+    });
+
+    // Allow Enter key to submit password
+    document.getElementById('password-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('password-submit').click();
       }
     });
 
