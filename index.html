@@ -400,8 +400,9 @@
 
   <div id="final" class="cipher-section">
     <h2 class="final-reveal">YOU ARE TRAPPED IN THE ABYSS FOREVER</h2>
-    <p class="final-reveal">All ciphers solved, but the horror never ends. The doll's embrace is eternal, her laughter echoing through the endless night. You've played the game, decoded the secrets, but in doing so, you've invited the darkness in. She was waiting for someone clever enough to find her— and now, she's found you. The abyss swallows all, and you are hers forever. No reset, no escape. The tape loops eternally, and so does your torment.</p>
-    <p class="final-reveal">She has you now.</p>
+    <img src="assets/doll-bg.jpg" alt="The Doll" style="max-width: 300px; display: block; margin: 20px auto; border: 2px solid #ff0000;">
+    <p class="final-reveal">All ciphers solved, but the horror never ends. The doll's embrace is eternal, her porcelain skin cold against your flesh, her glass eyes reflecting your terror. Her laughter echoes through the endless night, a sound that twists your sanity. You've played the game, decoded the secrets, but in doing so, you've invited the darkness in. She was waiting for someone clever enough to find her— and now, she's found you. The abyss swallows all, pulling you deeper into madness. Your screams are silent, your struggles futile. No reset, no escape. The tape loops eternally, and so does your torment. Feel her fingers in your mind, rearranging your thoughts. You are not alone; you are hers.</p>
+    <p class="final-reveal">She has you now. Forever.</p>
   </div>
 
   <!-- stop looking -->
@@ -485,6 +486,7 @@
       osc.stop(audioContext.currentTime + 0.2); // short beep
     }
 
+    let helpKeys = '';
     document.addEventListener('keydown', (e) => {
       if (e.keyCode === KONAMI[konamiIndex]) {
         konamiIndex++;
@@ -498,6 +500,14 @@
       } else {
         konamiIndex = 0;
       }
+
+      // Help Easter egg
+      helpKeys += e.key.toLowerCase();
+      if (helpKeys.includes('help')) {
+        alert('No help comes. The dolls are listening.');
+        helpKeys = '';
+      }
+      if (helpKeys.length > 10) helpKeys = helpKeys.slice(-10);
     });
 
     // Reveal hidden message on click
@@ -527,7 +537,17 @@
       }
     });
 
-    // Random console messages
+    let lastActivity = Date.now();
+    document.addEventListener('mousemove', () => lastActivity = Date.now());
+    document.addEventListener('keydown', () => lastActivity = Date.now());
+    document.addEventListener('click', () => lastActivity = Date.now());
+
+    setInterval(() => {
+      if (Date.now() - lastActivity > 30000) { // 30 seconds
+        alert('The dolls grow impatient. Move, or join them.');
+        lastActivity = Date.now();
+      }
+    }, 5000);
     setInterval(() => {
       const messages = [
         "the dolls are watching",
