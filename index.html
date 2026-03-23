@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analog Horror: The Doll Cipher</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      filter: sepia(0.3) contrast(1.2) brightness(0.8);
+      position: relative;
+    }
+
+    h1, h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      animation: textGlitch 2s infinite;
+      letter-spacing: 2px;
+      color: #ffcccc;
+    }
+
+    @keyframes textGlitch {
+      0%, 100% { transform: translate(0); }
+      10% { transform: translate(-1px, 1px); }
+      20% { transform: translate(1px, -1px); }
+      30% { transform: translate(0); }
+      70% { transform: translate(0); }
+      80% { transform: translate(-1px, -1px); }
+      90% { transform: translate(1px, 1px); }
+    }
+
+    p {
+      font-size: 1.1em;
+      margin: 15px 0;
+      letter-spacing: 1px;
+    }
+
+    .binary {
+      display: block;
+      line-height: 1.6;
+      opacity: 0.8;
+      font-size: 1.3em;
+      color: #ccccff;
+    }
+
+    @keyframes screenGlitch {
+      0% { background-color: black; }
+      50% { background-color: #1a0000; }
+      100% { background-color: black; }
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      25% { opacity: 0.3; }
+      50% { opacity: 1; }
+      75% { opacity: 0.5; }
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(2px, -2px); }
+      60% { transform: translate(-2px, -2px); }
+      80% { transform: translate(2px, 2px); }
+      100% { transform: translate(0); }
+    }
+
+    /* VHS Scanlines */
+    .scanlines::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.03) 2px,
+        rgba(255, 255, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      animation: scanlineMove 0.1s linear infinite;
+    }
+
+    .glitch {
+      color: #faafaf;
+      text-shadow: 0 0 8px #ff6666;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+    }
+
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      opacity: 0.7;
+      color: #ffcccc;
+      clip-path: inset(0 0 0 0);
+    }
+
+    .glitch::before {
+      left: 2px;
+      text-shadow: -2px 0 #e63939;
+      animation: glitchLayer 1s infinite;
+    }
+
+    .glitch::after {
+      left: -2px;
+      text-shadow: 2px 0 #7f2a2a;
+      animation: glitchLayer 1.2s infinite;
+    }
+
+    @keyframes glitchLayer {
+      0%, 100% { clip-path: inset(0 0 0 0); }
+      10% { clip-path: inset(30% 0 0 0); }
+      20% { clip-path: inset(0 0 30% 0); }
+      30% { clip-path: inset(0 0 0 30%); }
+      40% { clip-path: inset(15% 0 15% 0); }
+      50% { clip-path: inset(0 15% 0 15%); }
+      60% { clip-path: inset(40% 0 0 0); }
+      70% { clip-path: inset(0 0 40% 0); }
+      80% { clip-path: inset(0 40% 0 0); }
+      90% { clip-path: inset(10% 0 10% 0); }
+    }
+
+    @keyframes scanlineMove {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(4px); }
+    }
+
+    /* Static Noise */
+    .static {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><pattern id="noise" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="%23000"/><circle cx="50" cy="50" r="1" fill="%23fff" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23noise)"/></svg>');
+      opacity: 0.1;
+      animation: staticFlicker 0.05s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes staticFlicker {
+      0%, 100% { opacity: 0.05; }
+      50% { opacity: 0.15; }
+    }
+
+    #tape-counter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 0.8em;
+      color: #888;
+      background: rgba(0,0,0,0.5);
+      padding: 5px;
+      border-radius: 3px;
+      z-index: 2;
+    }
+
+    #hidden-message {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      color: #ff6600;
+      font-size: 0.85em;
+      opacity: 0;
+      transition: opacity 0.4s, transform 0.4s;
+      transform: translateY(10px);
+      z-index: 2;
+      pointer-events: none;
+      text-shadow: 0 0 8px rgba(255,102,0,0.9);
+    }
+
+    #hidden-message.revealed {
+      opacity: 0.8;
+      transform: translateY(0px);
+    }
+
+    #initial-page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cipher-section {
+      display: none;
+      margin: 20px;
+      padding: 20px;
+      border: 2px solid #666;
+      background-color: rgba(0, 0, 0, 0.7);
+      position: relative;
+      z-index: 1;
+    }
+
+    .cipher-section.active {
+      display: block;
+    }
+
+    input {
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #666;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 0.9em;
+      text-align: center;
+      width: 200px;
+    }
+
+    button {
+      background-color: #333;
+      color: #fff;
+      border: 2px solid #666;
+      padding: 10px 20px;
+      font-family: monospace;
+      font-size: 1em;
+      cursor: pointer;
+      margin: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      background-color: #555;
+      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+
+    .horror-text {
+      font-size: 1.3em;
+      color: #ff6666;
+      text-shadow: 0 0 8px #ff6666;
+      animation: fadeIn 1s;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .final-reveal {
+      font-size: 2em;
+      color: #ffffff;
+      text-shadow: 0 0 20px #ffffff;
+      animation: finalGlitch 0.2s infinite;
+    }
+
+    /* Doll Elements */
+    .doll {
+      position: absolute;
+      font-size: 2em;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .doll:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+    .doll:nth-child(2) { top: 20%; right: 15%; animation-delay: 1s; }
+    .doll:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 2s; }
+    .doll:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 3s; }
+    .doll:nth-child(5) { top: 50%; left: 5%; animation-delay: 4s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="static"></div>
+  <div class="scanlines"></div>
+
+  <!-- Doll Elements -->
+  <div class="doll">🧸</div>
+  <div class="doll">👻</div>
+  <div class="doll">🧟</div>
+  <div class="doll">👹</div>
+  <div class="doll">🎎</div>
+
+  <div id="tape-counter">TAPE: 001</div>
+
+  <div id="initial-page">
+    <h2>analog horror: the doll cipher</h2>
+    <p class="glitch">i̶͇̯͕̣̹̋̽̾̒̃̂͑̂͒͐̀̋̆̈͛̾̀̿̒͐̋̚̚͠͝ ̸̢͔͓͚̮̙̠̼̜̖͔̝̹̳̖̙̝͇͛̆̃̈́̕ͅw̵̛̛̛̠͓͈̬̙̯̹̯̔̈́̂̈́͒̅̎̽͒̿͌͒̽̂̇͋̅͒̾̕̕͝͝͠ą̸̧̧̝̜̪̟̝̗̤͎̞̗͖̘̩̞̰̜͎̣͔̹̜̘͈̘̱͌͗͐̊̈̍̿̈n̷̡͚͎̭̱̱͔͚̘̮̫͚̊̔͊t̶̨͙̝̯͔͖͔͖̳͕̒̔̚͜ͅͅ ̶̡̺̰̦̦̦͇̠̼̼͖͓̪̰̩̜̣̬̺̲̯͙̳͕̿̾́͊̂̊͂͛͐̓͘͘͜͝t̷̟̯̝͓͈̱̼̼̺̝̳͑̒̐̔͆̐̿̀͂̿̅̂̉͠ͅͅo̶̧̡̗̣̝͍͔̼͕̗̝̞͖̹̭̥̪̪͎͕̙̜̪͚̣͉̍̈̆͜ͅͅ ̸̣͎̲̗̩̩͔̱̮̦͆̄͗͛̆̐̒̿̇͐̊͒̋̌̈́̉͊̅͆̊̕͝ͅͅp̷̧̡̡̛̛̛̛̛̲͙͇̹͉̠̰̻̞͎̹̹̪̹͉̘̥̮̣̤̣̳͕͚̀̾̎̍͂͌̐͊̒́̀̀̑͌̈́͆͛̊͊̓͊ͅl̶̨͈̤̼̱̙̝̐̀̈̓͋͆̎̿̕͠ą̸̨̡̻͇͓͓͍̐̐̽́̽̾̌͊̓̔́̂͑̄̋̐̽̈̑̄̒̿͗̽̇̓̚͝͝y̴̢̟̣͎̰̪͍̠̲̫̔̑͐̍̈̿̅͛̆͘͘͘͝~
+    </p>
+    <p>
+      <span class="binary">01001100 01001111 01001100 01001100 01001001</span>
+      <br>
+      <small>(L O L L I)</small>
+    </p>
+    <button id="play-tape">PLAY TAPE</button>
+  </div>
+
+  <div id="hidden-message">hidden file: 028_abracadabra</div>
+
+  <!-- Cipher Sections -->
+  <div id="cipher1" class="cipher-section">
+    <h2>Caesar Cipher</h2>
+    <p>Decode this message (shift by 3): "wkh grro lv dolyh"</p>
+    <input type="text" id="caesar-input" placeholder="Enter decoded message">
+    <button id="caesar-submit">Submit</button>
+    <div id="caesar-reveal" class="horror-text" style="display: none;">
+      The doll is alive... and she's coming for you.
+    </div>
+  </div>
+
+  <div id="cipher2" class="cipher-section">
+    <h2>Atbash Cipher</h2>
+    <p>Decode this message: "svok nv"</p>
+    <input type="text" id="atbash-input" placeholder="Enter decoded message">
+    <button id="atbash-submit">Submit</button>
+    <div id="atbash-reveal" class="horror-text" style="display: none;">
+      Help me... but it's too late for you.
+    </div>
+  </div>
+
+  <div id="cipher3" class="cipher-section">
+    <h2>Morse Code</h2>
+    <p>Decode this message: "-. ..- -."</p>
+    <input type="text" id="morse-input" placeholder="Enter decoded message">
+    <button id="morse-submit">Submit</button>
+    <div id="morse-reveal" class="horror-text" style="display: none;">
+      Run... but you can't escape the abyss.
+    </div>
+  </div>
+
+  <div id="cipher4" class="cipher-section">
+    <h2>Vigenère Cipher</h2>
+    <p>Decode this message with key "key": "liukvc dlc qlmcx"</p>
+    <input type="text" id="vigenere-input" placeholder="Enter decoded message">
+    <button id="vigenere-submit">Submit</button>
+    <div id="vigenere-reveal" class="horror-text" style="display: none;">
+      Beware the ghost... it's already inside you.
+    </div>
+  </div>
+
+  <div id="cipher5" class="cipher-section">
+    <h2>Base64</h2>
+    <p>Decode this message: "Ymxvb2Q="</p>
+    <input type="text" id="base64-input" placeholder="Enter decoded message">
+    <button id="base64-submit">Submit</button>
+    <div id="base64-reveal" class="horror-text" style="display: none;">
+      Blood... your blood will stain the screen.
+    </div>
+  </div>
+
+  <div id="cipher6" class="cipher-section">
+    <h2>ROT13</h2>
+    <p>Decode this message: "rivy"</p>
+    <input type="text" id="rot13-input" placeholder="Enter decoded message">
+    <button id="rot13-submit">Submit</button>
+    <div id="rot13-reveal" class="horror-text" style="display: none;">
+      Evil... pure evil surrounds you.
+    </div>
+  </div>
+
+  <div id="cipher7" class="cipher-section">
+    <h2>Bacon's Cipher</h2>
+    <p>Decode this message (A=0, B=1 for each 5-bit letter): "AABAA BABAB ABABA AABAA"</p>
+    <input type="text" id="bacon-input" placeholder="Enter decoded message">
+    <button id="bacon-submit">Submit</button>
+    <div id="bacon-reveal" class="horror-text" style="display: none;">
+      Evil... the cipher reveals the truth.
+    </div>
+  </div>
+
+  <div id="cipher8" class="cipher-section">
+    <h2>Rail Fence Cipher</h2>
+    <p>Decode this message with 3 rails: "cehirp"</p>
+    <input type="text" id="rail-input" placeholder="Enter decoded message">
+    <button id="rail-submit">Submit</button>
+    <div id="rail-reveal" class="horror-text" style="display: none;">
+      Cipher... the code to your doom.
+    </div>
+  </div>
+
+  <div id="final" class="cipher-section">
+    <h2 class="final-reveal">YOU ARE TRAPPED IN THE ABYSS FOREVER</h2>
+    <p class="final-reveal">All ciphers solved, but the horror never ends...</p>
+    <p class="final-reveal">She has you now.</p>
+  </div>
+
+  <!-- stop looking -->
+
+  <audio autoplay loop>
+    <source src="assets/laugh.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    console.log("analog horror tape loaded");
+    console.log("%cDOLLS ARE EVERYWHERE", "color: #ffcccc; font-size: 16px; font-weight: bold; text-shadow: 0 0 5px #ffcccc;");
+
+    const KONAMI = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+    let konamiIndex = 0;
+    let tapeClicks = 0;
+    let audioContext;
+
+    function startAmbientSound() {
+      if (audioContext) return;
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const noiseNode = (function () {
+        const bufferSize = 2 * audioContext.sampleRate;
+        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = (Math.random() * 2 - 1) * 0.25;
+        }
+        const whiteNoise = audioContext.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+        return whiteNoise;
+      })();
+
+      osc.type = 'sawtooth';
+      osc.frequency.value = 50;
+      gain.gain.value = 0.07;
+
+      const distortion = audioContext.createWaveShaper();
+      const curve = new Float32Array(44100);
+      for (let i = 0; i < 44100; i++) {
+        const x = (i * 2) / 44100 - 1;
+        curve[i] = ((Math.PI + 10) * x) / (Math.PI + 10 * Math.abs(x));
+      }
+      distortion.curve = curve;
+      distortion.oversample = '4x';
+
+      osc.connect(distortion);
+      distortion.connect(gain);
+      noiseNode.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start();
+      noiseNode.start();
+      setTimeout(() => {
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 4);
+      }, 30000); // fade out after 30 seconds
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === KONAMI[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === KONAMI.length) {
+          alert('Easter egg unlocked: A secret passage opens.');
+          const hidden = document.getElementById('hidden-message');
+          hidden.innerHTML = '> you found the lost cassette';
+          hidden.classList.add('revealed');
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = 0;
+      }
+    });
+
+    // Reveal hidden message on click
+    document.addEventListener('click', () => {
+      const hidden = document.getElementById('hidden-message');
+      hidden.classList.toggle('revealed');
+    });
+
+    // Secret counters
+    document.getElementById('tape-counter').addEventListener('click', () => {
+      tapeClicks++;
+      if (tapeClicks === 5) {
+        const egg = document.createElement('div');
+        egg.textContent = 'EASTER EGG: VHS Breaker ID = 1977';
+        egg.style.position = 'absolute';
+        egg.style.top = '50%';
+        egg.style.left = '50%';
+        egg.style.transform = 'translate(-50%, -50%)';
+        egg.style.color = '#99ff99';
+        egg.style.background = 'rgba(0,0,0,0.75)';
+        egg.style.padding = '12px';
+        egg.style.border = '1px solid #99ff99';
+        egg.style.zIndex = '999';
+        egg.classList.add('final-reveal');
+        document.body.appendChild(egg);
+        setTimeout(() => egg.remove(), 6000);
+      }
+    });
+
+    // Random console messages
+    setInterval(() => {
+      const messages = [
+        "the dolls are watching",
+        "tape distortion detected",
+        "analog signals fading",
+        "ghost in the machine",
+        "dolls don't blink"
+      ];
+      console.log("%" + "c" + messages[Math.floor(Math.random() * messages.length)], 
+        "color: #888; font-style: italic;");
+    }, 8000);
+
+    // ARG Logic
+    let currentCipher = 0;
+    const ciphers = ['cipher1', 'cipher2', 'cipher3', 'cipher4', 'cipher5', 'cipher6', 'cipher7', 'cipher8', 'final'];
+
+    document.getElementById('play-tape').addEventListener('click', () => {
+      document.getElementById('initial-page').style.display = 'none';
+      showCipher(0);
+      startAmbientSound();
+      let tapeVal = Number(document.getElementById('tape-counter').textContent.replace(/\D/g, ''));
+      tapeVal = Number.isInteger(tapeVal) ? tapeVal + 1 : 2;
+      document.getElementById('tape-counter').textContent = `TAPE: ${String(tapeVal).padStart(3, '0')}`;
+    });
+
+    function showCipher(index) {
+      document.querySelectorAll('.cipher-section').forEach(section => section.classList.remove('active'));
+      document.getElementById(ciphers[index]).classList.add('active');
+      currentCipher = index;
+    }
+
+    // Caesar Cipher Check
+    document.getElementById('caesar-submit').addEventListener('click', () => {
+      const input = document.getElementById('caesar-input').value.toLowerCase().trim();
+      if (input === 'the doll is alive') {
+        document.getElementById('caesar-reveal').style.display = 'block';
+        setTimeout(() => showCipher(1), 3000);
+      } else {
+        alert('The tape skips... try again.');
+      }
+    });
+
+    // Atbash Cipher Check
+    document.getElementById('atbash-submit').addEventListener('click', () => {
+      const input = document.getElementById('atbash-input').value.toLowerCase().trim();
+      if (input === 'help me') {
+        document.getElementById('atbash-reveal').style.display = 'block';
+        setTimeout(() => showCipher(2), 3000);
+      } else {
+        alert('Static fills the screen...');
+      }
+    });
+
+    // Morse Code Check
+    document.getElementById('morse-submit').addEventListener('click', () => {
+      const input = document.getElementById('morse-input').value.toLowerCase().trim();
+      if (input === 'run') {
+        document.getElementById('morse-reveal').style.display = 'block';
+        setTimeout(() => showCipher(3), 3000);
+      } else {
+        alert('The signal distorts...');
+      }
+    });
+
+    // Vigenère Cipher Check
+    document.getElementById('vigenere-submit').addEventListener('click', () => {
+      const input = document.getElementById('vigenere-input').value.toLowerCase().trim();
+      if (input === 'beware the ghost') {
+        document.getElementById('vigenere-reveal').style.display = 'block';
+        setTimeout(() => showCipher(4), 3000);
+      } else {
+        alert('Whispers on the tape...');
+      }
+    });
+
+    // Base64 Check
+    document.getElementById('base64-submit').addEventListener('click', () => {
+      const input = document.getElementById('base64-input').value.toLowerCase().trim();
+      if (input === 'blood') {
+        document.getElementById('base64-reveal').style.display = 'block';
+        setTimeout(() => showCipher(5), 3000);
+      } else {
+        alert('The image flickers...');
+      }
+    });
+
+    // ROT13 Check
+    document.getElementById('rot13-submit').addEventListener('click', () => {
+      const input = document.getElementById('rot13-input').value.toLowerCase().trim();
+      if (input === 'evil') {
+        document.getElementById('rot13-reveal').style.display = 'block';
+        setTimeout(() => showCipher(6), 3000);
+      } else {
+        alert('Echoes from the past...');
+      }
+    });
+
+    // Bacon Cipher Check
+    document.getElementById('bacon-submit').addEventListener('click', () => {
+      const input = document.getElementById('bacon-input').value.toLowerCase().trim();
+      if (input === 'evil') {
+        document.getElementById('bacon-reveal').style.display = 'block';
+        setTimeout(() => showCipher(7), 3000);
+      } else {
+        alert('The dolls watch...');
+      }
+    });
+
+    // Rail Fence Check
+    document.getElementById('rail-submit').addEventListener('click', () => {
+      const input = document.getElementById('rail-input').value.toLowerCase().trim();
+      if (input === 'cipher') {
+        document.getElementById('rail-reveal').style.display = 'block';
+        setTimeout(() => showCipher(8), 3000);
+      } else {
+        alert('The tracks bend...');
+      }
+    });
+
+    // Final horror effect
+    setInterval(() => {
+      if (document.getElementById('final').classList.contains('active')) {
+        document.body.style.backgroundColor = Math.random() > 0.5 ? '#ff0000' : '#000000';
+      }
+    }, 100);
+  </script>
+</body>
+</html>
